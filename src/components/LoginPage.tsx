@@ -114,9 +114,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         )}
 
         <div className="flex items-center gap-2">
-          <span className={`w-2.5 h-2.5 rounded-full ${isSupabaseConfigured() ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
           <span className="text-xs text-slate-400 font-medium">
-            {isSupabaseConfigured() ? 'Supabase Auth Ready' : 'Standalone Local Auth'}
+            Database Supabase Connected
           </span>
         </div>
       </div>

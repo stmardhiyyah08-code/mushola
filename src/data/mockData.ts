@@ -3,13 +3,13 @@ import { MosqueProfile, Transaction, WANotification, AuditLog } from '../types';
 export const initialMosqueProfile: MosqueProfile = {
   name: "Masjid SDN 012 Tarakan",
   tagline: "Transparan, Amanah, dan Berbasis Digital Untuk Kemaslahatan Umat",
-  address: "Jl. Raya Utama No. 88, Kompleks Islamic Center",
-  city: "Kota Jakarta Selatan, DKI Jakarta 12430",
+  address: "Jl. Subrantas, Kota Tarakan",
+  city: "Kota Tarakan, Kalimantan Utara",
   phone: "+62 812-3456-7890",
-  email: "keuangan@masjid-alikhlas.or.id",
-  ketuaTakmir: "H. Ahmad Fauzi, M.Ag",
-  bendahara: "H. Ir. Bambang Suroso",
-  auditor: "Drs. H. M. Ridwan, Ak., CA",
+  email: "keuangan@masjid-sdn012tarakan.or.id",
+  ketuaTakmir: "Pengurus Masjid",
+  bendahara: "Bendahara Masjid",
+  auditor: "Auditor Keuangan",
   bankAccounts: [
     { bankName: "Bank Syariah Indonesia (BSI)", accountNumber: "7123-4567-89", accountName: "Masjid SDN 012 Tarakan Kas Utama" },
     { bankName: "Bank Mandiri", accountNumber: "127-00-0987654-3", accountName: "Masjid SDN 012 Tarakan Donasi" },
@@ -19,231 +19,17 @@ export const initialMosqueProfile: MosqueProfile = {
   qrisNmid: "ID102439871238491",
   qrisMerchantName: "MASJID SDN 012 Tarakan",
   qrisImageUrl: "",
-  qrisCustomPayload: "00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920MASJID AGUNG AL-IKHLAS6013Jakarta South61051243062250721",
+  qrisCustomPayload: "00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920MASJID SDN 012 Tarakan6013Tarakan61057710062250721",
   waGatewayStatus: "connected",
   waGatewayNumber: "+6281234567890",
-  waApiKey: "sk_wa_live_98a7f6e5d4c3b2a1"
+  waApiKey: ""
 };
 
-export const initialTransactions: Transaction[] = [
-  {
-    id: "tx-20260801-001",
-    receiptNo: "KWT-202608-001",
-    date: "2026-08-01",
-    time: "07:30",
-    type: "pemasukan",
-    amount: 12500000,
-    fundAccount: "Kas Utama",
-    category: "Infaq Jumat",
-    description: "Infaq dan Sedekah Jamaah Shalat Jumat Kliwon",
-    donorName: "Jamaah Jumat Al-Ikhlas",
-    donorPhone: "08123456789",
-    paymentMethod: "cash",
-    status: "verified",
-    checksum: "sha256-a1b2c3d4e5f6",
-    createdBy: "H. Ir. Bambang Suroso",
-    createdAt: "2026-08-01T07:30:00Z"
-  },
-  {
-    id: "tx-20260801-002",
-    receiptNo: "KWT-202608-002",
-    date: "2026-08-01",
-    time: "08:15",
-    type: "pemasukan",
-    amount: 3500000,
-    fundAccount: "Kas Yatim & Dhuafa",
-    category: "Donasi Yatim & Dhuafa",
-    description: "Hamba Allah untuk Program Beasiswa Santri Yatim",
-    donorName: "Hamba Allah (Ibu Rina)",
-    donorPhone: "081987654321",
-    paymentMethod: "qris",
-    status: "verified",
-    checksum: "sha256-b2c3d4e5f6a1",
-    createdBy: "System QRIS",
-    createdAt: "2026-08-01T08:15:00Z"
-  },
-  {
-    id: "tx-20260731-003",
-    receiptNo: "KWT-202607-089",
-    date: "2026-07-31",
-    time: "14:20",
-    type: "pengeluaran",
-    amount: 2850000,
-    fundAccount: "Kas Utama",
-    category: "Operasional Listrik & Air",
-    description: "Pembayaran Tagihan Listrik PLN & Air PDAM Bulan Juli 2026",
-    donorName: "-",
-    donorPhone: "",
-    paymentMethod: "bank_transfer_bsi",
-    status: "verified",
-    checksum: "sha256-c3d4e5f6a1b2",
-    createdBy: "H. Ir. Bambang Suroso",
-    createdAt: "2026-07-31T14:20:00Z"
-  },
-  {
-    id: "tx-20260730-004",
-    receiptNo: "KWT-202607-088",
-    date: "2026-07-30",
-    time: "10:00",
-    type: "pemasukan",
-    amount: 15000000,
-    fundAccount: "Kas Renovasi",
-    category: "Infaq Renovasi & Pembangunan",
-    description: "Infaq Perbaikan Atap Kubah & Pemasangan Solar Panel",
-    donorName: "H. Agus Setiawan & Keluarga",
-    donorPhone: "081345678901",
-    paymentMethod: "bank_transfer_mandiri",
-    status: "verified",
-    checksum: "sha256-d4e5f6a1b2c3",
-    createdBy: "H. Ir. Bambang Suroso",
-    createdAt: "2026-07-30T10:00:00Z"
-  },
-  {
-    id: "tx-20260729-005",
-    receiptNo: "KWT-202607-087",
-    date: "2026-07-29",
-    time: "16:45",
-    type: "pengeluaran",
-    amount: 1500000,
-    fundAccount: "Kas Utama",
-    category: "Pemeliharaan Gedung & AC",
-    description: "Service Rutin 8 Unit AC Utama & Cuci Filter Air",
-    donorName: "-",
-    paymentMethod: "cash",
-    status: "verified",
-    checksum: "sha256-e5f6a1b2c3d4",
-    createdBy: "H. Ir. Bambang Suroso",
-    createdAt: "2026-07-29T16:45:00Z"
-  },
-  {
-    id: "tx-20260728-006",
-    receiptNo: "KWT-202607-086",
-    date: "2026-07-28",
-    time: "19:30",
-    type: "pemasukan",
-    amount: 2000000,
-    fundAccount: "Kas Zakat & Infaq",
-    category: "Zakat Mal / Fitrah",
-    description: "Zakat Maal Perusahaan Bapak Hendra Wijaya",
-    donorName: "Bpk. Hendra Wijaya",
-    donorPhone: "081567890123",
-    paymentMethod: "gopay",
-    status: "verified",
-    checksum: "sha256-f6a1b2c3d4e5",
-    createdBy: "System QRIS",
-    createdAt: "2026-07-28T19:30:00Z"
-  },
-  {
-    id: "tx-20260725-007",
-    receiptNo: "KWT-202607-085",
-    date: "2026-07-25",
-    time: "09:00",
-    type: "pengeluaran",
-    amount: 5000000,
-    fundAccount: "Kas Yatim & Dhuafa",
-    category: "Santunan Yatim & Dhuafa",
-    description: "Penyaluran Santunan Bulanan Paket Sembako & Uang Saku 50 Yatim",
-    donorName: "-",
-    paymentMethod: "cash",
-    status: "verified",
-    checksum: "sha256-1a2b3c4d5e6f",
-    createdBy: "H. Ir. Bambang Suroso",
-    createdAt: "2026-07-25T09:00:00Z"
-  },
-  {
-    id: "tx-20260724-008",
-    receiptNo: "KWT-202607-084",
-    date: "2026-07-24",
-    time: "12:30",
-    type: "pemasukan",
-    amount: 11200000,
-    fundAccount: "Kas Utama",
-    category: "Infaq Jumat",
-    description: "Infaq Shalat Jumat Pekan ke-4 Juli",
-    donorName: "Jamaah Jumat Al-Ikhlas",
-    paymentMethod: "cash",
-    status: "verified",
-    checksum: "sha256-2b3c4d5e6f7a",
-    createdBy: "H. Ir. Bambang Suroso",
-    createdAt: "2026-07-24T12:30:00Z"
-  },
-  {
-    id: "tx-20260720-009",
-    receiptNo: "KWT-202607-083",
-    date: "2026-07-20",
-    time: "11:15",
-    type: "pengeluaran",
-    amount: 4500000,
-    fundAccount: "Kas Utama",
-    category: "Gaji Marbot & Imam",
-    description: "Honorarium Imam, Muadzin, dan 2 Marbot Masjid Juli 2026",
-    donorName: "-",
-    paymentMethod: "bank_transfer_bsi",
-    status: "verified",
-    checksum: "sha256-3c4d5e6f7a8b",
-    createdBy: "H. Ir. Bambang Suroso",
-    createdAt: "2026-07-20T11:15:00Z"
-  },
-  {
-    id: "tx-20260718-010",
-    receiptNo: "KWT-202607-082",
-    date: "2026-07-18",
-    time: "20:00",
-    type: "pemasukan",
-    amount: 1000000,
-    fundAccount: "Kas Utama",
-    category: "Donasi QRIS / Digital",
-    description: "Donasi Digital via QRIS ShopeePay Subuh Berkah",
-    donorName: "Bunda Dian Permata",
-    donorPhone: "081789012345",
-    paymentMethod: "shopeepay",
-    status: "verified",
-    checksum: "sha256-4d5e6f7a8b9c",
-    createdBy: "System QRIS",
-    createdAt: "2026-07-18T20:00:00Z"
-  }
-];
+// Clean slate: No example dummy transactions, clean database ready for real data
+export const initialTransactions: Transaction[] = [];
 
-export const initialWANotifications: WANotification[] = [
-  {
-    id: "wa-001",
-    transactionId: "tx-20260801-002",
-    recipientPhone: "081987654321",
-    recipientName: "Hamba Allah (Ibu Rina)",
-    message: "Jazakallahu Khairan Ibu Rina! Donasi Anda sebesar Rp 3.500.000 untuk Kas Yatim & Dhuafa di Masjid SDN 012 Tarakan telah kami terima secara real-time (No KWT: KWT-202608-002). Terenkripsi & Terverifikasi Ledger Audit.",
-    sentAt: "2026-08-01T08:15:05Z",
-    status: "sent",
-    gatewayResponse: "200 OK (Fonnte API Sent)"
-  },
-  {
-    id: "wa-002",
-    transactionId: "tx-20260730-004",
-    recipientPhone: "081345678901",
-    recipientName: "H. Agus Setiawan",
-    message: "Jazakallahu Khairan Bpk H. Agus Setiawan! Infaq Renovasi sebesar Rp 15.000.000 telah diverifikasi oleh Bendahara Masjid SDN 012 Tarakan(No KWT: KWT-202607-088).",
-    sentAt: "2026-07-30T10:01:12Z",
-    status: "sent",
-    gatewayResponse: "200 OK (Wablas API Sent)"
-  }
-];
+// Clean slate: No sample notifications
+export const initialWANotifications: WANotification[] = [];
 
-export const initialAuditLogs: AuditLog[] = [
-  {
-    id: "audit-001",
-    timestamp: "2026-08-01T08:15:00Z",
-    user: "System Automated QRIS",
-    action: "NEW_DONATION_VERIFIED",
-    details: "Menerima donasi digital Rp 3.500.000 via QRIS (Kas Yatim)",
-    previousHash: "0000000000000000000000000000000000000000000000000000000000000000",
-    currentHash: "sha256-b2c3d4e5f6a1"
-  },
-  {
-    id: "audit-002",
-    timestamp: "2026-08-01T07:30:00Z",
-    user: "H. Ir. Bambang Suroso (Bendahara)",
-    action: "RECORD_INCOME",
-    details: "Mencatat Pemasukan Infaq Jumat Rp 12.500.000",
-    previousHash: "sha256-b2c3d4e5f6a1",
-    currentHash: "sha256-a1b2c3d4e5f6"
-  }
-];
+// Clean slate: No sample audit logs
+export const initialAuditLogs: AuditLog[] = [];

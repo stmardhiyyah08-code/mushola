@@ -11,9 +11,12 @@ export function getSupabaseConfig(): { url: string; key: string } {
   const localUrl = typeof localStorage !== 'undefined' ? localStorage.getItem('simasjid_supabase_url') || '' : '';
   const localKey = typeof localStorage !== 'undefined' ? localStorage.getItem('simasjid_supabase_key') || '' : '';
 
+  const defaultUrl = "https://hrpflxbpwvotnafeyetm.supabase.co";
+  const defaultKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhycGZseGJwd3ZvdG5hZmV5ZXRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1ODk3NjksImV4cCI6MjEwMTE2NTc2OX0.hG6aDDTUTAf67ktvOlQyuGg-UlsTl16uwfDjB7YoMUw";
+
   return {
-    url: envUrl || localUrl,
-    key: envKey || localKey
+    url: envUrl || localUrl || defaultUrl,
+    key: envKey || localKey || defaultKey
   };
 }
 
