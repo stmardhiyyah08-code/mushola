@@ -67,18 +67,19 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
 
   const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pinCode === '123456' || pinCode === '888888' || pinCode.length >= 4) {
-      onLoginSuccess({
-        isLogged: true,
-        userRole: role,
-        userName: role === 'treasurer' ? 'H. Ir. Bambang Suroso (Bendahara)' : role === 'admin' ? 'H. Ahmad Fauzi, M.Ag (Ketua Takmir)' : 'Drs. H. M. Ridwan (Auditor)',
-        authMethod: 'pin',
-        lastActive: new Date().toISOString()
-      });
-      onClose();
-    } else {
-      setErrorMsg('PIN Salah. Gunakan PIN Pengurus (default: 123456)');
+    if (!pinCode || pinCode.length < 4) {
+      setErrorMsg('Masukkan PIN Pengurus yang valid.');
+      return;
     }
+
+    onLoginSuccess({
+      isLogged: true,
+      userRole: role,
+      userName: role === 'treasurer' ? 'H. Ir. Bambang Suroso (Bendahara)' : role === 'admin' ? 'H. Ahmad Fauzi, M.Ag (Ketua Takmir)' : 'Drs. H. M. Ridwan (Auditor)',
+      authMethod: 'pin',
+      lastActive: new Date().toISOString()
+    });
+    onClose();
   };
 
   return (
@@ -224,7 +225,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                   maxLength={6}
                   value={pinCode}
                   onChange={(e) => setPinCode(e.target.value)}
-                  placeholder="• • • • • • (Default: 123456)"
+                  placeholder="Masukkan 6 angka PIN..."
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-lg font-mono font-bold tracking-widest text-emerald-400 focus:outline-none focus:border-emerald-500"
                 />
               </div>

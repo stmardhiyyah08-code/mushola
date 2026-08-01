@@ -10,14 +10,18 @@ import { AIFinancialAssistantModal } from './components/AIFinancialAssistantModa
 import { WhatsAppManagerModal } from './components/WhatsAppManagerModal';
 import { AuditIntegrityModal } from './components/AuditIntegrityModal';
 import { CloudflareSupabaseModal } from './components/CloudflareSupabaseModal';
+import { QRISManagerModal } from './components/QRISManagerModal';
+import { LoginPage } from './components/LoginPage';
 
 import { Transaction, MosqueProfile, UserSession, FinancialStats } from './types';
 import { initialMosqueProfile, initialTransactions } from './data/mockData';
-import { Building2, HeartHandshake, ShieldCheck, Heart, Sparkles, MessageSquare, Cloud } from 'lucide-react';
+import { Building2, HeartHandshake, ShieldCheck, Heart, Sparkles, MessageSquare, Cloud, QrCode } from 'lucide-react';
+import { saveTransactionToSupabase, saveMosqueProfileToSupabase } from './lib/supabase';
 
 export default function App() {
   const [mosque, setMosque] = useState<MosqueProfile>(initialMosqueProfile);
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'login'>('dashboard');
   
   // User Session state
   const [session, setSession] = useState<UserSession>({
@@ -36,6 +40,7 @@ export default function App() {
   const [isWAModalOpen, setIsWAModalOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isCloudflareModalOpen, setIsCloudflareModalOpen] = useState(false);
+  const [isQRISModalOpen, setIsQRISModalOpen] = useState(false);
 
   // Fetch initial data from backend API
   useEffect(() => {
@@ -98,16 +103,7 @@ export default function App() {
   // Handle Adding New Transaction
   const handleAddTransaction = async (newTx: Transaction) => {
     setTransactions(prev => [newTx, ...prev]);
-
-    try {
-      await fetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTx)
-      });
-    } catch (err) {
-      console.error('Failed to sync transaction to backend API', err);
-    }
+    await saveTransactionToSupabase(newTx);
   };
 
   // Handle Deleting Transaction
@@ -136,6 +132,21 @@ export default function App() {
     }
   };
 
+  // Force display Login Page if user is not logged in or requested login view
+  if (!session.isLogged || currentView === 'login') {
+    return (
+      <LoginPage
+        mosque={mosque}
+        canGoBack={session.isLogged}
+        onLoginSuccess={(newSession) => {
+          setSession(newSession);
+          setCurrentView('dashboard');
+        }}
+        onBackToApp={() => setCurrentView('dashboard')}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-emerald-500 selection:text-white flex flex-col">
       
@@ -143,7 +154,7 @@ export default function App() {
       <Header
         mosque={mosque}
         session={session}
-        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenAuth={() => setCurrentView('login')}
         onLogout={() => {
           setSession({
             isLogged: false,
@@ -158,6 +169,7 @@ export default function App() {
         onOpenWA={() => setIsWAModalOpen(true)}
         onOpenAudit={() => setIsAuditModalOpen(true)}
         onOpenCloudflare={() => setIsCloudflareModalOpen(true)}
+        onOpenQRISManager={() => setIsQRISModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -187,6 +199,14 @@ export default function App() {
             >
               <HeartHandshake className="w-4 h-4" />
               <span>Infaq / Donasi QRIS</span>
+            </button>
+
+            <button
+              onClick={() => setIsQRISModalOpen(true)}
+              className="px-4 py-3 rounded-2xl bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 font-semibold text-xs transition-all flex items-center gap-2 active:scale-95"
+            >
+              <QrCode className="w-4 h-4 text-teal-600" />
+              <span>Menu QRIS</span>
             </button>
 
             <button
@@ -270,6 +290,13 @@ export default function App() {
         onLoginSuccess={(newSession) => setSession(newSession)}
       />
 
+      <QRISManagerModal
+        isOpen={isQRISModalOpen}
+        onClose={() => setIsQRISModalOpen(false)}
+        mosque={mosque}
+        onUpdateMosque={(updated) => setMosque(updated)}
+      />
+
       <AIFinancialAssistantModal
         isOpen={isAIModalOpen}
         onClose={() => setIsAIModalOpen(false)}
@@ -295,3 +322,4 @@ export default function App() {
     </div>
   );
 }
+

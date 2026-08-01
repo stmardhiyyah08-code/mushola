@@ -267,14 +267,26 @@ export const DonationModal: React.FC<DonationModalProps> = ({
           {step === 'qr_pay' && (
             <div className="text-center space-y-4 py-2">
               
-              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 inline-block">
-                <span className="text-xs text-slate-400 block mb-1">Scan QRIS Dinamis {mosque.name}</span>
-                <div className="bg-white p-3 rounded-xl inline-block shadow-lg">
-                  <QRCodeSVG 
-                    value={`00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920${mosque.name}6013Jakarta South61051243062250721${amount}63041A2B`}
-                    size={180}
+              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 inline-block max-w-full">
+                <span className="text-xs text-slate-400 block mb-1">
+                  Scan QRIS Official: {mosque.qrisMerchantName || mosque.name}
+                </span>
+                
+                {mosque.qrisImageUrl ? (
+                  <img
+                    src={mosque.qrisImageUrl}
+                    alt="QRIS Official"
+                    className="w-48 h-48 object-contain rounded-xl border border-slate-700 bg-white p-2 mx-auto"
                   />
-                </div>
+                ) : (
+                  <div className="bg-white p-3 rounded-xl inline-block shadow-lg">
+                    <QRCodeSVG 
+                      value={mosque.qrisCustomPayload ? `${mosque.qrisCustomPayload}5405${amount}` : `00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920${mosque.qrisMerchantName || mosque.name}6013Jakarta South61051243062250721${amount}`}
+                      size={180}
+                    />
+                  </div>
+                )}
+
                 <div className="mt-2 text-[11px] text-slate-400 font-mono">
                   NMID: {mosque.qrisNmid}
                 </div>

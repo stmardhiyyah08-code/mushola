@@ -5,11 +5,12 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import dotenv from 'dotenv';
 import { initialTransactions, initialMosqueProfile, initialWANotifications, initialAuditLogs } from './src/data/mockData.js';
-import { Transaction, WANotification, AuditLog } from './src/types.js';
+import { Transaction, MosqueProfile, WANotification, AuditLog } from './src/types.js';
 
 dotenv.config();
 
 // In-memory persistent data store
+let mosqueProfileStore: MosqueProfile = { ...initialMosqueProfile };
 let transactionsStore: Transaction[] = [...initialTransactions];
 let waNotificationsStore: WANotification[] = [...initialWANotifications];
 let auditLogsStore: AuditLog[] = [...initialAuditLogs];
@@ -29,7 +30,17 @@ async function startServer() {
 
   // Get Mosque Profile & Stats
   app.get('/api/mosque-profile', (req, res) => {
-    res.json(initialMosqueProfile);
+    res.json(mosqueProfileStore);
+  });
+
+  // Update Mosque Profile & QRIS Settings
+  app.put('/api/mosque-profile', (req, res) => {
+    try {
+      mosqueProfileStore = { ...mosqueProfileStore, ...req.body };
+      res.json({ success: true, profile: mosqueProfileStore });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   });
 
   // Get Transactions

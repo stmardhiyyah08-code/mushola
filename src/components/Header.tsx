@@ -11,7 +11,8 @@ import {
   Cloud,
   CheckCircle2,
   KeyRound,
-  UserCheck
+  UserCheck,
+  QrCode
 } from 'lucide-react';
 import { MosqueProfile, UserSession } from '../types';
 
@@ -25,6 +26,7 @@ interface HeaderProps {
   onOpenWA: () => void;
   onOpenAudit: () => void;
   onOpenCloudflare: () => void;
+  onOpenQRISManager: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -36,7 +38,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAI,
   onOpenWA,
   onOpenAudit,
-  onOpenCloudflare
+  onOpenCloudflare,
+  onOpenQRISManager
 }) => {
   return (
     <header className="bg-white text-slate-800 border-b border-slate-200 sticky top-0 z-40 shadow-sm">
@@ -110,6 +113,16 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Cloud className="w-4 h-4 text-sky-600" />
               <span className="hidden md:inline">Cloudflare/Supabase</span>
+            </button>
+
+            {/* QRIS & Bank Account Settings Manager */}
+            <button
+              onClick={onOpenQRISManager}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 text-xs font-semibold transition-all"
+              title="Kelola Kode QRIS & Rekening Bank Masjid"
+            >
+              <QrCode className="w-4 h-4 text-teal-600" />
+              <span>Menu QRIS</span>
             </button>
 
             {/* Auth Session Button */}

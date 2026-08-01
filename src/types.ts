@@ -67,6 +67,9 @@ export interface MosqueProfile {
     accountName: string;
   }[];
   qrisNmid: string;
+  qrisMerchantName?: string;
+  qrisImageUrl?: string;
+  qrisCustomPayload?: string;
   waGatewayStatus: 'connected' | 'disconnected' | 'testing';
   waGatewayNumber: string;
   waApiKey: string;

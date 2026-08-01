@@ -17,6 +17,9 @@ export const initialMosqueProfile: MosqueProfile = {
     { bankName: "Bank Rakyat Indonesia (BRI)", accountNumber: "0341-01-000456-30-2", accountName: "Kas Pembangunan Masjid" }
   ],
   qrisNmid: "ID102439871238491",
+  qrisMerchantName: "MASJID AGUNG AL-IKHLAS",
+  qrisImageUrl: "",
+  qrisCustomPayload: "00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920MASJID AGUNG AL-IKHLAS6013Jakarta South61051243062250721",
   waGatewayStatus: "connected",
   waGatewayNumber: "+6281234567890",
   waApiKey: "sk_wa_live_98a7f6e5d4c3b2a1"
