@@ -1,8 +1,8 @@
 -- ====================================================================
--- SIMASJID - SKEMA DATABASE SUPABASE / POSTGRESQL REALTIME (LENGKAP)
--- Terintegrasi Otomatis Untuk Semua Menu & Fitur SiMasjid
--- (Profil Masjid, QRIS Global, Rekening Bank, Transaksi Kas, WA Gateway,
---  Audit SHA-256 Ledger, User Auth RLS & System Config)
+-- SIMASJID - SKEMA DATABASE SUPABASE POSTGRESQL REALTIME (LENGKAP)
+-- Terintegrasi Otomatis Untuk Seluruh Menu Aplikasi SiMasjid
+-- (Profil Masjid, QRIS Global, Rekening Transfer Bank, Buku Kas Transaksi,
+--  Log WA Gateway, Audit Ledger SHA-256, User Verification Auth & Config)
 -- ====================================================================
 
 -- 1. EXTENSIONS
@@ -11,28 +11,29 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ====================================================================
 -- TABEL 1: PROFIL MASJID, PENGATURAN QRIS & REKENING BANK GLOBAL
+-- (Digunakan oleh Menu Header, Dashboard & Menu QRIS)
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS public.mosque_profile (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(255) NOT NULL DEFAULT 'Masjid Agung Al-Ikhlas',
+    name VARCHAR(255) NOT NULL DEFAULT 'Masjid SDN 012 Tarakan',
     tagline TEXT DEFAULT 'Transparan, Amanah, dan Berbasis Digital Untuk Kemaslahatan Umat',
-    address TEXT DEFAULT 'Jl. Raya Utama No. 88, Kompleks Islamic Center',
-    city VARCHAR(255) DEFAULT 'Kota Jakarta Selatan, DKI Jakarta 12430',
+    address TEXT DEFAULT 'Jl. Subrantas, Kota Tarakan',
+    city VARCHAR(255) DEFAULT 'Kota Tarakan, Kalimantan Utara',
     phone VARCHAR(50) DEFAULT '+62 812-3456-7890',
-    email VARCHAR(255) DEFAULT 'keuangan@masjid-alikhlas.or.id',
-    ketua_takmir VARCHAR(255) DEFAULT 'H. Ahmad Fauzi, M.Ag',
-    bendahara VARCHAR(255) DEFAULT 'H. Ir. Bambang Suroso',
-    auditor VARCHAR(255) DEFAULT 'Drs. H. M. Ridwan, Ak., CA',
+    email VARCHAR(255) DEFAULT 'keuangan@masjid-sdn012tarakan.or.id',
+    ketua_takmir VARCHAR(255) DEFAULT 'Pengurus Masjid',
+    bendahara VARCHAR(255) DEFAULT 'Bendahara Masjid',
+    auditor VARCHAR(255) DEFAULT 'Auditor Keuangan',
     
-    -- Pengaturan Menu QRIS & Rekening Transfer Global
+    -- Pengaturan Menu QRIS & Rekening Bank Transfer Global
     qris_nmid VARCHAR(100) DEFAULT 'ID102439871238491',
-    qris_merchant_name VARCHAR(255) DEFAULT 'MASJID AGUNG AL-IKHLAS',
+    qris_merchant_name VARCHAR(255) DEFAULT 'MASJID SDN 012 Tarakan',
     qris_image_url TEXT DEFAULT '',
-    qris_custom_payload TEXT DEFAULT '00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920MASJID AGUNG AL-IKHLAS6013Jakarta South61051243062250721',
+    qris_custom_payload TEXT DEFAULT '00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920MASJID SDN 012 Tarakan6013Tarakan61057710062250721',
     bank_accounts JSONB DEFAULT '[
-        {"bankName": "Bank Syariah Indonesia (BSI)", "accountNumber": "7123-4567-89", "accountName": "Masjid Agung Al-Ikhlas Kas Utama"},
-        {"bankName": "Bank Mandiri", "accountNumber": "127-00-0987654-3", "accountName": "Masjid Agung Al-Ikhlas Donasi"},
-        {"bankName": "Bank Central Asia (BCA)", "accountNumber": "883-0987-123", "accountName": "Yayasan Masjid Al-Ikhlas"},
+        {"bankName": "Bank Syariah Indonesia (BSI)", "accountNumber": "7123-4567-89", "accountName": "Masjid SDN 012 Tarakan Kas Utama"},
+        {"bankName": "Bank Mandiri", "accountNumber": "127-00-0987654-3", "accountName": "Masjid SDN 012 Tarakan Donasi"},
+        {"bankName": "Bank Central Asia (BCA)", "accountNumber": "883-0987-123", "accountName": "Yayasan Masjid SDN 012 Tarakan"},
         {"bankName": "Bank Rakyat Indonesia (BRI)", "accountNumber": "0341-01-000456-30-2", "accountName": "Kas Pembangunan Masjid"}
     ]'::jsonb,
 
@@ -47,6 +48,7 @@ CREATE TABLE IF NOT EXISTS public.mosque_profile (
 
 -- ====================================================================
 -- TABEL 2: TRANSAKSI KEUANGAN KAS MASJID & KUITANSI DIGITAL
+-- (Digunakan oleh Menu Infaq, Tabel Transaksi, & Laporan Keuangan)
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS public.transactions (
     id VARCHAR(100) PRIMARY KEY,
@@ -72,7 +74,8 @@ CREATE TABLE IF NOT EXISTS public.transactions (
 );
 
 -- ====================================================================
--- TABEL 3: MENU WHATSAPP NOTIFICATIONS & DISPATCH LOG
+-- TABEL 3: MENU WHATSAPP NOTIFICATIONS LOG
+-- (Digunakan oleh Menu WA Notif)
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS public.wa_notifications (
     id VARCHAR(100) PRIMARY KEY DEFAULT 'wa-' || extract(epoch from now())::text,
@@ -87,6 +90,7 @@ CREATE TABLE IF NOT EXISTS public.wa_notifications (
 
 -- ====================================================================
 -- TABEL 4: MENU AUDIT INTEGRITY LEDGER (SHA-256 CHAIN)
+-- (Digunakan oleh Menu Audit SHA-256)
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS public.audit_logs (
     id VARCHAR(100) PRIMARY KEY DEFAULT 'audit-' || extract(epoch from now())::text,
@@ -99,7 +103,8 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 );
 
 -- ====================================================================
--- TABEL 5: MANAJEMEN USER PENGURUS & OTENTIKASI (AUTH)
+-- TABEL 5: MANAJEMEN USER PENGURUS & OTENTIKASI VERIFIKASI SUPABASE
+-- (Wajib Terdaftar & Terverifikasi di Supabase Sebelum Login)
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -108,7 +113,9 @@ CREATE TABLE IF NOT EXISTS public.users (
     role VARCHAR(50) NOT NULL CHECK (role IN ('admin', 'treasurer', 'auditor', 'guest')),
     password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
+    is_verified BOOLEAN DEFAULT TRUE,
     is_active BOOLEAN DEFAULT TRUE,
+    verification_code VARCHAR(50) DEFAULT 'VERIFIED_SUPABASE',
     last_login TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -116,6 +123,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 
 -- ====================================================================
 -- TABEL 6: KONFIGURASI SISTEM CLOUDFLARE & SUPABASE
+-- (Digunakan oleh Modal Setup Cloudflare/Supabase)
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS public.system_configs (
     config_key VARCHAR(100) PRIMARY KEY,
@@ -125,20 +133,20 @@ CREATE TABLE IF NOT EXISTS public.system_configs (
 );
 
 -- ====================================================================
--- INDEXES PERFORMANCE QUERY
+-- INDEXES UNTUK PERFORMA PERMINTAAN DATA REALTIME
 -- ====================================================================
 CREATE INDEX IF NOT EXISTS idx_transactions_date ON public.transactions(date DESC);
 CREATE INDEX IF NOT EXISTS idx_transactions_type ON public.transactions(type);
 CREATE INDEX IF NOT EXISTS idx_transactions_fund ON public.transactions(fund_account);
 CREATE INDEX IF NOT EXISTS idx_transactions_category ON public.transactions(category);
-CREATE INDEX IF NOT EXISTS idx_wa_notifications_recipient ON public.wa_notifications(recipient_phone);
 CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
+CREATE INDEX IF NOT EXISTS idx_users_verified ON public.users(is_verified, is_active);
 
 -- ====================================================================
--- DATABASE VIEWS (RINGKASAN REAL-TIME UNTUK DASHBOARD)
+-- DATABASE VIEWS RINGKASAN DATA UNTUK DASHBOARD
 -- ====================================================================
 
--- View 1: Ringkasan Saldo per Akun Kas
+-- View 1: Saldo Kas Real-time per Akun
 CREATE OR REPLACE VIEW public.vw_kas_summary AS
 SELECT 
     fund_account,
@@ -163,11 +171,17 @@ SELECT
 FROM public.mosque_profile
 LIMIT 1;
 
+-- View 3: Pengurus Terverifikasi Supabase
+CREATE OR REPLACE VIEW public.vw_verified_users AS
+SELECT id, email, name, role, is_verified, is_active, created_at
+FROM public.users
+WHERE is_verified = true AND is_active = true;
+
 -- ====================================================================
--- SEED DATA AWAL MASJID
+-- SEED DATA AWAL PROFIL MASJID (TANPA TRANSAKSI CONTOH)
 -- ====================================================================
 INSERT INTO public.mosque_profile (id, name, qris_nmid, qris_merchant_name)
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Masjid Agung Al-Ikhlas', 'ID102439871238491', 'MASJID AGUNG AL-IKHLAS')
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Masjid SDN 012 Tarakan', 'ID102439871238491', 'MASJID SDN 012 Tarakan')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.system_configs (config_key, config_value, description)
@@ -195,7 +209,7 @@ CREATE POLICY "Public read audit logs" ON public.audit_logs FOR SELECT USING (tr
 -- Policy: Akses Tulis Publik untuk Donasi QRIS
 CREATE POLICY "Public insert donation transactions" ON public.transactions FOR INSERT WITH CHECK (true);
 
--- Policy: Akses Penuh untuk Admin / Pengurus
+-- Policy: Akses Penuh untuk Admin / Pengurus Terverifikasi
 CREATE POLICY "Full access mosque profile" ON public.mosque_profile FOR ALL USING (true);
 CREATE POLICY "Full access transactions" ON public.transactions FOR ALL USING (true);
 CREATE POLICY "Full access wa notifications" ON public.wa_notifications FOR ALL USING (true);

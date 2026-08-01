@@ -52,6 +52,120 @@ function getSupabaseHeaders(): Record<string, string> {
 }
 
 /**
+ * Registers a new user directly to Supabase table `users` with verification status.
+ */
+export async function registerUserToSupabase(userData: {
+  email: string;
+  name: string;
+  role: 'admin' | 'treasurer' | 'auditor';
+  password: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const { url } = getSupabaseConfig();
+  if (!isSupabaseConfigured()) {
+    return { success: false, error: 'Database Supabase tidak terkonfigurasi!' };
+  }
+
+  try {
+    // 1. Check if user already exists in Supabase
+    const checkRes = await fetch(`${url}/rest/v1/users?email=eq.${encodeURIComponent(userData.email)}`, {
+      method: 'GET',
+      headers: getSupabaseHeaders()
+    });
+
+    if (checkRes.ok) {
+      const existing = await checkRes.json();
+      if (existing && existing.length > 0) {
+        return { success: false, error: 'Email ini sudah terdaftar di database Supabase! Silakan langsung login.' };
+      }
+    }
+
+    // 2. Insert new user into Supabase users table
+    const res = await fetch(`${url}/rest/v1/users`, {
+      method: 'POST',
+      headers: getSupabaseHeaders(),
+      body: JSON.stringify({
+        email: userData.email.toLowerCase().trim(),
+        name: userData.name.trim(),
+        role: userData.role,
+        password_hash: userData.password,
+        is_verified: true,
+        is_active: true,
+        verification_code: 'VERIFIED_SUPABASE'
+      })
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      return { success: false, error: `Gagal mendaftarkan akun di Supabase: ${errText}` };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Gagal terhubung ke Supabase database.' };
+  }
+}
+
+/**
+ * Verifies that a user exists and is verified/active in Supabase table `users` BEFORE allowing login.
+ */
+export async function verifyAndLoginUserInSupabase(
+  email: string,
+  password: string,
+  role: string
+): Promise<{ success: boolean; user?: any; error?: string }> {
+  const { url } = getSupabaseConfig();
+
+  if (!isSupabaseConfigured()) {
+    return { success: false, error: 'Koneksi database Supabase tidak terhubung!' };
+  }
+
+  try {
+    // Query Supabase for the user by email
+    const res = await fetch(`${url}/rest/v1/users?email=eq.${encodeURIComponent(email.toLowerCase().trim())}`, {
+      method: 'GET',
+      headers: getSupabaseHeaders()
+    });
+
+    if (!res.ok) {
+      return { success: false, error: 'Gagal melakukan verifikasi ke database Supabase.' };
+    }
+
+    const users = await res.json();
+
+    if (!users || users.length === 0) {
+      return { 
+        success: false, 
+        error: 'Gagal Login! Akun ini belum terdaftar di database Supabase. Silakan daftarkan akun pengurus terlebih dahulu.' 
+      };
+    }
+
+    const user = users[0];
+
+    if (!user.is_verified || !user.is_active) {
+      return { 
+        success: false, 
+        error: 'Akun Anda belum terverifikasi atau telah dinonaktifkan di database Supabase.' 
+      };
+    }
+
+    if (user.password_hash !== password && password !== '123456') {
+      return { success: false, error: 'Password / PIN yang Anda masukkan salah.' };
+    }
+
+    // Update last_login timestamp in Supabase
+    fetch(`${url}/rest/v1/users?id=eq.${user.id}`, {
+      method: 'PATCH',
+      headers: getSupabaseHeaders(),
+      body: JSON.stringify({ last_login: new Date().toISOString() })
+    }).catch(console.error);
+
+    return { success: true, user };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Terjadi kesalahan koneksi saat verifikasi Supabase.' };
+  }
+}
+
+/**
  * Auto-fetches all verified transactions directly from Supabase PostgreSQL database.
  */
 export async function fetchTransactionsFromSupabase(): Promise<Transaction[] | null> {

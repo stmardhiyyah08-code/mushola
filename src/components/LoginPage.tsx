@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Building2, KeyRound, ShieldCheck, UserCheck, Lock, ArrowLeft, CheckCircle2, User, Eye, EyeOff, Sparkles, ChevronRight, Mail, UserPlus, LogIn } from 'lucide-react';
 import { UserSession, MosqueProfile } from '../types';
-import { isSupabaseConfigured } from '../lib/supabase';
+import { isSupabaseConfigured, registerUserToSupabase, verifyAndLoginUserInSupabase } from '../lib/supabase';
 
 interface LoginPageProps {
   mosque: MosqueProfile;
@@ -53,44 +53,62 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
+
+    if (!email) {
+      setErrorMsg('Mohon masukkan alamat Email resmi.');
+      return;
+    }
 
     if (!password || password.length < 4) {
       setErrorMsg('Password / PIN minimal 4 karakter.');
       return;
     }
 
-    if (mode === 'register' && (!email || !name)) {
-      setErrorMsg('Mohon isi Nama Lengkap dan Email resmi.');
+    if (mode === 'register' && !name) {
+      setErrorMsg('Mohon isi Nama Lengkap Pengurus.');
       return;
     }
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
+    if (mode === 'register') {
+      const res = await registerUserToSupabase({
+        email,
+        name,
+        role: selectedRole,
+        password
+      });
 
-      if (mode === 'register') {
-        setSuccessMsg(`Akun ${name} (${selectedRole.toUpperCase()}) berhasil dibuat! Silakan masuk.`);
+      setIsLoading(false);
+      if (res.success) {
+        setSuccessMsg(`Alhamdulillah! Akun ${name} (${selectedRole.toUpperCase()}) berhasil terdaftar & terverifikasi di Supabase database. Silakan langsung masuk.`);
         setMode('login');
         setPassword('');
       } else {
-        const roleData = roles.find(r => r.id === selectedRole);
-        const userDisplayName = name || (email ? email.split('@')[0] : (roleData?.person || 'Pengurus Masjid'));
+        setErrorMsg(res.error || 'Gagal mendaftarkan akun di Supabase.');
+      }
+    } else {
+      // Login Verification directly against Supabase users table
+      const res = await verifyAndLoginUserInSupabase(email, password, selectedRole);
+      setIsLoading(false);
 
+      if (res.success && res.user) {
         const newSession: UserSession = {
           isLogged: true,
-          userRole: selectedRole,
-          userName: userDisplayName,
+          userRole: res.user.role || selectedRole,
+          userName: res.user.name || name || 'Pengurus Masjid',
           authMethod: 'password',
           lastActive: new Date().toISOString()
         };
         onLoginSuccess(newSession);
+      } else {
+        setErrorMsg(res.error || 'Gagal login. Akun tidak ditemukan di database Supabase.');
       }
-    }, 600);
+    }
   };
 
   return (
