@@ -12,7 +12,8 @@ import {
   CheckCircle2,
   KeyRound,
   UserCheck,
-  QrCode
+  QrCode,
+  Users
 } from 'lucide-react';
 import { MosqueProfile, UserSession } from '../types';
 
@@ -27,6 +28,7 @@ interface HeaderProps {
   onOpenAudit: () => void;
   onOpenCloudflare: () => void;
   onOpenQRISManager: () => void;
+  onOpenUserManager?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -39,7 +41,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenWA,
   onOpenAudit,
   onOpenCloudflare,
-  onOpenQRISManager
+  onOpenQRISManager,
+  onOpenUserManager
 }) => {
   return (
     <header className="bg-white text-slate-800 border-b border-slate-200 sticky top-0 z-40 shadow-sm">
@@ -124,6 +127,18 @@ export const Header: React.FC<HeaderProps> = ({
               <QrCode className="w-4 h-4 text-teal-600" />
               <span>Menu QRIS</span>
             </button>
+
+            {/* Admin Only: Kelola Role & Tanggung Jawab Pengurus */}
+            {session.isLogged && session.userRole === 'admin' && onOpenUserManager && (
+              <button
+                onClick={onOpenUserManager}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-semibold transition-all shadow-sm"
+                title="Kelola Hak Akses & Role Pengurus (Super Admin)"
+              >
+                <Users className="w-4 h-4 text-purple-600" />
+                <span>Kelola Role</span>
+              </button>
+            )}
 
             {/* Auth Session Button */}
             {session.isLogged ? (

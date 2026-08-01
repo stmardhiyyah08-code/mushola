@@ -163,6 +163,100 @@ export async function verifyUserCodeInSupabase(
 }
 
 /**
+ * Fetches all registered users from Supabase table `users` (For Admin management).
+ */
+export async function fetchUsersFromSupabase(): Promise<any[]> {
+  const { url } = getSupabaseConfig();
+  if (!isSupabaseConfigured()) return [];
+
+  try {
+    const res = await fetch(`${url}/rest/v1/users?select=*&order=created_at.desc`, {
+      method: 'GET',
+      headers: getSupabaseHeaders()
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    console.error('Failed to fetch users from Supabase:', err);
+    return [];
+  }
+}
+
+/**
+ * Adds a new Pengurus user directly by Super Admin into Supabase table `users`.
+ */
+export async function addUserByAdminToSupabase(userData: {
+  email: string;
+  name: string;
+  role: 'admin' | 'treasurer' | 'auditor';
+  password: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const { url } = getSupabaseConfig();
+  if (!isSupabaseConfigured()) {
+    return { success: false, error: 'Database Supabase tidak terkonfigurasi!' };
+  }
+
+  try {
+    const cleanEmail = userData.email.toLowerCase().trim();
+
+    // Check existing
+    const checkRes = await fetch(`${url}/rest/v1/users?email=eq.${encodeURIComponent(cleanEmail)}`, {
+      method: 'GET',
+      headers: getSupabaseHeaders()
+    });
+
+    if (checkRes.ok) {
+      const existing = await checkRes.json();
+      if (existing && existing.length > 0) {
+        return { success: false, error: 'Email ini sudah terdaftar di database Supabase!' };
+      }
+    }
+
+    const res = await fetch(`${url}/rest/v1/users`, {
+      method: 'POST',
+      headers: getSupabaseHeaders(),
+      body: JSON.stringify({
+        email: cleanEmail,
+        name: userData.name.trim(),
+        role: userData.role,
+        password_hash: userData.password,
+        is_verified: true,
+        is_active: true,
+        verification_code: 'ADMIN_VERIFIED'
+      })
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      return { success: false, error: `Gagal menambahkan akun di Supabase: ${errText}` };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Terjadi kesalahan koneksi.' };
+  }
+}
+
+/**
+ * Deletes a user account from Supabase table `users` (For Admin).
+ */
+export async function deleteUserFromSupabase(userId: string): Promise<boolean> {
+  const { url } = getSupabaseConfig();
+  if (!isSupabaseConfigured()) return false;
+
+  try {
+    const res = await fetch(`${url}/rest/v1/users?id=eq.${userId}`, {
+      method: 'DELETE',
+      headers: getSupabaseHeaders()
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('Error deleting user from Supabase:', err);
+    return false;
+  }
+}
+
+/**
  * Verifies user credentials & mandatory verification status in Supabase BEFORE allowing login.
  */
 export async function verifyAndLoginUserInSupabase(

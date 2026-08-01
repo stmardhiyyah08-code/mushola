@@ -11,6 +11,7 @@ import { WhatsAppManagerModal } from './components/WhatsAppManagerModal';
 import { AuditIntegrityModal } from './components/AuditIntegrityModal';
 import { CloudflareSupabaseModal } from './components/CloudflareSupabaseModal';
 import { QRISManagerModal } from './components/QRISManagerModal';
+import { UserManagerModal } from './components/UserManagerModal';
 import { LoginPage } from './components/LoginPage';
 
 import { Transaction, MosqueProfile, UserSession, FinancialStats } from './types';
@@ -47,6 +48,7 @@ export default function App() {
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isCloudflareModalOpen, setIsCloudflareModalOpen] = useState(false);
   const [isQRISModalOpen, setIsQRISModalOpen] = useState(false);
+  const [isUserManagerModalOpen, setIsUserManagerModalOpen] = useState(false);
 
   // Load initial data automatically from Supabase PostgreSQL database
   const refreshData = async () => {
@@ -192,6 +194,7 @@ export default function App() {
         onOpenAudit={() => setIsAuditModalOpen(true)}
         onOpenCloudflare={() => setIsCloudflareModalOpen(true)}
         onOpenQRISManager={() => setIsQRISModalOpen(true)}
+        onOpenUserManager={() => setIsUserManagerModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -340,6 +343,11 @@ export default function App() {
         isOpen={isCloudflareModalOpen}
         onClose={() => setIsCloudflareModalOpen(false)}
         onRefreshData={refreshData}
+      />
+
+      <UserManagerModal
+        isOpen={isUserManagerModalOpen}
+        onClose={() => setIsUserManagerModalOpen(false)}
       />
 
     </div>

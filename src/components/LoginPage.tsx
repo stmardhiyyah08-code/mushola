@@ -242,17 +242,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               )}
 
               {mode === 'login' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('register');
-                    setErrorMsg('');
-                    setSuccessMsg('');
-                  }}
-                  className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold underline underline-offset-4"
-                >
-                  + Buat Akun
-                </button>
+                <span className="text-[11px] text-slate-400 font-medium">
+                  Penambahan akun dilakukan oleh Super Admin
+                </span>
               )}
             </div>
           </div>
