@@ -3,7 +3,6 @@ export type TransactionType = 'pemasukan' | 'pengeluaran' | 'transfer';
 export type FundAccount = 'Kas Utama' | 'Kas Yatim & Dhuafa' | 'Kas Renovasi' | 'Kas Zakat & Infaq';
 
 export type PaymentMethod = 
-  | 'qris'
   | 'gopay'
   | 'ovo'
   | 'dana'
@@ -17,7 +16,6 @@ export type PaymentMethod =
 export type TransactionCategory =
   | 'Infaq Jumat'
   | 'Infaq Harian / Subuh'
-  | 'Donasi QRIS / Digital'
   | 'Donasi Yatim & Dhuafa'
   | 'Infaq Renovasi & Pembangunan'
   | 'Zakat Mal / Fitrah'
@@ -66,10 +64,6 @@ export interface MosqueProfile {
     accountNumber: string;
     accountName: string;
   }[];
-  qrisNmid: string;
-  qrisMerchantName?: string;
-  qrisImageUrl?: string;
-  qrisCustomPayload?: string;
   waGatewayStatus: 'connected' | 'disconnected' | 'testing';
   waGatewayNumber: string;
   waApiKey: string;

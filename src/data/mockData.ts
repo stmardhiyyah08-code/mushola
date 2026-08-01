@@ -16,10 +16,6 @@ export const initialMosqueProfile: MosqueProfile = {
     { bankName: "Bank Central Asia (BCA)", accountNumber: "883-0987-123", accountName: "Yayasan Masjid SDN 012 Tarakan" },
     { bankName: "Bank Rakyat Indonesia (BRI)", accountNumber: "0341-01-000456-30-2", accountName: "Kas Pembangunan Masjid" }
   ],
-  qrisNmid: "ID102439871238491",
-  qrisMerchantName: "MASJID SDN 012 Tarakan",
-  qrisImageUrl: "",
-  qrisCustomPayload: "00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920MASJID SDN 012 Tarakan6013Tarakan61057710062250721",
   waGatewayStatus: "connected",
   waGatewayNumber: "+6281234567890",
   waApiKey: ""

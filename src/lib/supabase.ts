@@ -474,10 +474,6 @@ export async function fetchMosqueProfileFromSupabase(): Promise<MosqueProfile | 
       bendahara: item.bendahara,
       auditor: item.auditor,
       bankAccounts: item.bank_accounts || item.bankAccounts || [],
-      qrisNmid: item.qris_nmid || item.qrisNmid,
-      qrisMerchantName: item.qris_merchant_name || item.qrisMerchantName,
-      qrisImageUrl: item.qris_image_url || item.qrisImageUrl,
-      qrisCustomPayload: item.qris_custom_payload || item.qrisCustomPayload,
       waGatewayStatus: item.wa_gateway_status || item.waGatewayStatus || 'connected',
       waGatewayNumber: item.wa_gateway_number || item.waGatewayNumber || '',
       waApiKey: item.wa_api_key || item.waApiKey || ''
@@ -489,7 +485,7 @@ export async function fetchMosqueProfileFromSupabase(): Promise<MosqueProfile | 
 }
 
 /**
- * Auto-saves or updates Mosque Profile & QRIS Settings in Supabase table `mosque_profile`.
+ * Auto-saves or updates Mosque Profile in Supabase table `mosque_profile`.
  */
 export async function saveMosqueProfileToSupabase(profile: MosqueProfile): Promise<boolean> {
   const { url } = getSupabaseConfig();
@@ -522,10 +518,6 @@ export async function saveMosqueProfileToSupabase(profile: MosqueProfile): Promi
       ketua_takmir: profile.ketuaTakmir,
       bendahara: profile.bendahara,
       auditor: profile.auditor,
-      qris_nmid: profile.qrisNmid,
-      qris_merchant_name: profile.qrisMerchantName || profile.name,
-      qris_image_url: profile.qrisImageUrl || '',
-      qris_custom_payload: profile.qrisCustomPayload || '',
       bank_accounts: profile.bankAccounts,
       wa_gateway_status: profile.waGatewayStatus,
       wa_gateway_number: profile.waGatewayNumber,

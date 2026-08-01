@@ -4,7 +4,6 @@ import {
   LogOut, 
   KeyRound,
   UserCheck,
-  QrCode,
   Users
 } from 'lucide-react';
 import { MosqueProfile, UserSession } from '../types';
@@ -14,7 +13,6 @@ interface HeaderProps {
   session: UserSession;
   onOpenAuth: () => void;
   onLogout: () => void;
-  onOpenQRISManager: () => void;
   onOpenUserManager?: () => void;
 }
 
@@ -23,7 +21,6 @@ export const Header: React.FC<HeaderProps> = ({
   session,
   onOpenAuth,
   onLogout,
-  onOpenQRISManager,
   onOpenUserManager
 }) => {
   return (
@@ -50,16 +47,6 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Quick Action Navigation Bar */}
           <div className="flex flex-wrap items-center gap-2">
-
-            {/* QRIS & Bank Account Settings Manager */}
-            <button
-              onClick={onOpenQRISManager}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 text-xs font-semibold transition-all"
-              title="Kelola Kode QRIS & Rekening Bank Masjid"
-            >
-              <QrCode className="w-4 h-4 text-teal-600" />
-              <span>Menu QRIS</span>
-            </button>
 
             {/* Admin Only: Kelola Role & Tanggung Jawab Pengurus */}
             {session.isLogged && session.userRole === 'admin' && onOpenUserManager && (

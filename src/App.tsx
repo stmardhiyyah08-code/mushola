@@ -10,13 +10,12 @@ import { AIFinancialAssistantModal } from './components/AIFinancialAssistantModa
 import { WhatsAppManagerModal } from './components/WhatsAppManagerModal';
 import { AuditIntegrityModal } from './components/AuditIntegrityModal';
 import { CloudflareSupabaseModal } from './components/CloudflareSupabaseModal';
-import { QRISManagerModal } from './components/QRISManagerModal';
 import { UserManagerModal } from './components/UserManagerModal';
 import { LoginPage } from './components/LoginPage';
 
 import { Transaction, MosqueProfile, UserSession, FinancialStats } from './types';
 import { initialMosqueProfile, initialTransactions } from './data/mockData';
-import { Building2, HeartHandshake, ShieldCheck, Heart, Sparkles, MessageSquare, Cloud, QrCode } from 'lucide-react';
+import { Building2, HeartHandshake, ShieldCheck, Heart, Sparkles, MessageSquare, Cloud } from 'lucide-react';
 import { 
   saveTransactionToSupabase, 
   saveMosqueProfileToSupabase,
@@ -47,7 +46,6 @@ export default function App() {
   const [isWAModalOpen, setIsWAModalOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isCloudflareModalOpen, setIsCloudflareModalOpen] = useState(false);
-  const [isQRISModalOpen, setIsQRISModalOpen] = useState(false);
   const [isUserManagerModalOpen, setIsUserManagerModalOpen] = useState(false);
 
   // Load initial data automatically from Supabase PostgreSQL database
@@ -188,7 +186,6 @@ export default function App() {
             lastActive: new Date().toISOString()
           });
         }}
-        onOpenQRISManager={() => setIsQRISModalOpen(true)}
         onOpenUserManager={() => setIsUserManagerModalOpen(true)}
       />
 
@@ -218,15 +215,7 @@ export default function App() {
               className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-100 transition-all flex items-center gap-2 active:scale-95"
             >
               <HeartHandshake className="w-4 h-4" />
-              <span>Infaq / Donasi QRIS</span>
-            </button>
-
-            <button
-              onClick={() => setIsQRISModalOpen(true)}
-              className="px-4 py-3 rounded-2xl bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 font-semibold text-xs transition-all flex items-center gap-2 active:scale-95"
-            >
-              <QrCode className="w-4 h-4 text-teal-600" />
-              <span>Menu QRIS</span>
+              <span>Infaq / Transfer Donasi</span>
             </button>
 
             <button
@@ -308,13 +297,6 @@ export default function App() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={(newSession) => setSession(newSession)}
-      />
-
-      <QRISManagerModal
-        isOpen={isQRISModalOpen}
-        onClose={() => setIsQRISModalOpen(false)}
-        mosque={mosque}
-        onUpdateMosque={(updated) => setMosque(updated)}
       />
 
       <AIFinancialAssistantModal
