@@ -214,6 +214,7 @@ export default function App() {
           if (typeof localStorage !== 'undefined') {
             localStorage.removeItem('simasjid_session');
           }
+          setCurrentView('login');
         }}
         onOpenUserManager={() => setIsUserManagerModalOpen(true)}
       />
