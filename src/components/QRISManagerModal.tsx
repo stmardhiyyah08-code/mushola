@@ -21,7 +21,7 @@ export const QRISManagerModal: React.FC<QRISManagerModalProps> = ({
   const [merchantName, setMerchantName] = useState(mosque.qrisMerchantName || mosque.name);
   const [imageUrl, setImageUrl] = useState(mosque.qrisImageUrl || '');
   const [customPayload, setCustomPayload] = useState(
-    mosque.qrisCustomPayload || 
+    mosque.qrisCustomPayload ||
     `00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920${mosque.qrisMerchantName || mosque.name}6013Jakarta South610512430`
   );
 
@@ -84,7 +84,7 @@ export const QRISManagerModal: React.FC<QRISManagerModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white border border-slate-200 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-        
+
         {/* Modal Header */}
         <div className="p-5 bg-gradient-to-r from-emerald-800 to-teal-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -109,11 +109,10 @@ export const QRISManagerModal: React.FC<QRISManagerModalProps> = ({
         <div className="flex border-b border-slate-200 bg-slate-50 px-6 pt-3 gap-3 text-xs font-bold">
           <button
             onClick={() => setActiveTab('qris')}
-            className={`pb-3 px-3 border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === 'qris'
+            className={`pb-3 px-3 border-b-2 transition-all flex items-center gap-2 ${activeTab === 'qris'
                 ? 'border-emerald-600 text-emerald-700'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
-            }`}
+              }`}
           >
             <QrCode className="w-4 h-4" />
             <span>Seting Kode QRIS</span>
@@ -121,11 +120,10 @@ export const QRISManagerModal: React.FC<QRISManagerModalProps> = ({
 
           <button
             onClick={() => setActiveTab('bank')}
-            className={`pb-3 px-3 border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === 'bank'
+            className={`pb-3 px-3 border-b-2 transition-all flex items-center gap-2 ${activeTab === 'bank'
                 ? 'border-emerald-600 text-emerald-700'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
-            }`}
+              }`}
           >
             <CreditCard className="w-4 h-4" />
             <span>Rekening Bank Transfer ({bankAccounts.length})</span>
@@ -134,7 +132,7 @@ export const QRISManagerModal: React.FC<QRISManagerModalProps> = ({
 
         {/* Modal Form Content */}
         <form onSubmit={handleSave} className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-700">
-          
+
           {savedSuccess && (
             <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-xs text-emerald-800 font-medium animate-in fade-in">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -144,10 +142,10 @@ export const QRISManagerModal: React.FC<QRISManagerModalProps> = ({
 
           {activeTab === 'qris' && (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-              
+
               {/* Form Input Fields */}
               <div className="md:col-span-7 space-y-4 text-xs">
-                
+
                 <div>
                   <label className="block font-semibold text-slate-900 mb-1">
                     Nama Merchant / Atas Nama QRIS
@@ -158,7 +156,7 @@ export const QRISManagerModal: React.FC<QRISManagerModalProps> = ({
                     value={merchantName}
                     onChange={(e) => setMerchantName(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-emerald-600 focus:bg-white transition-all"
-                    placeholder="Contoh: MASJID AGUNG AL-IKHLAS"
+                    placeholder="Contoh: MASJID SDN 012 Tarakan"
                   />
                   <p className="text-[11px] text-slate-400 mt-1">Nama ini muncul saat donatur memindai QRIS.</p>
                 </div>

@@ -1,7 +1,7 @@
 import { MosqueProfile, Transaction, WANotification, AuditLog } from '../types';
 
 export const initialMosqueProfile: MosqueProfile = {
-  name: "Masjid Agung Al-Ikhlas",
+  name: "Masjid SDN 012 Tarakan",
   tagline: "Transparan, Amanah, dan Berbasis Digital Untuk Kemaslahatan Umat",
   address: "Jl. Raya Utama No. 88, Kompleks Islamic Center",
   city: "Kota Jakarta Selatan, DKI Jakarta 12430",
@@ -11,13 +11,13 @@ export const initialMosqueProfile: MosqueProfile = {
   bendahara: "H. Ir. Bambang Suroso",
   auditor: "Drs. H. M. Ridwan, Ak., CA",
   bankAccounts: [
-    { bankName: "Bank Syariah Indonesia (BSI)", accountNumber: "7123-4567-89", accountName: "Masjid Agung Al-Ikhlas Kas Utama" },
-    { bankName: "Bank Mandiri", accountNumber: "127-00-0987654-3", accountName: "Masjid Agung Al-Ikhlas Donasi" },
-    { bankName: "Bank Central Asia (BCA)", accountNumber: "883-0987-123", accountName: "Yayasan Masjid Al-Ikhlas" },
+    { bankName: "Bank Syariah Indonesia (BSI)", accountNumber: "7123-4567-89", accountName: "Masjid SDN 012 Tarakan Kas Utama" },
+    { bankName: "Bank Mandiri", accountNumber: "127-00-0987654-3", accountName: "Masjid SDN 012 Tarakan Donasi" },
+    { bankName: "Bank Central Asia (BCA)", accountNumber: "883-0987-123", accountName: "Yayasan Masjid SDN 012 Tarakan" },
     { bankName: "Bank Rakyat Indonesia (BRI)", accountNumber: "0341-01-000456-30-2", accountName: "Kas Pembangunan Masjid" }
   ],
   qrisNmid: "ID102439871238491",
-  qrisMerchantName: "MASJID AGUNG AL-IKHLAS",
+  qrisMerchantName: "MASJID SDN 012 Tarakan",
   qrisImageUrl: "",
   qrisCustomPayload: "00020101021226580016ID.GO.QRIS.WWW01189360091400000000005204581253033605802ID5920MASJID AGUNG AL-IKHLAS6013Jakarta South61051243062250721",
   waGatewayStatus: "connected",
@@ -210,7 +210,7 @@ export const initialWANotifications: WANotification[] = [
     transactionId: "tx-20260801-002",
     recipientPhone: "081987654321",
     recipientName: "Hamba Allah (Ibu Rina)",
-    message: "Jazakallahu Khairan Ibu Rina! Donasi Anda sebesar Rp 3.500.000 untuk Kas Yatim & Dhuafa di Masjid Agung Al-Ikhlas telah kami terima secara real-time (No KWT: KWT-202608-002). Terenkripsi & Terverifikasi Ledger Audit.",
+    message: "Jazakallahu Khairan Ibu Rina! Donasi Anda sebesar Rp 3.500.000 untuk Kas Yatim & Dhuafa di Masjid SDN 012 Tarakan telah kami terima secara real-time (No KWT: KWT-202608-002). Terenkripsi & Terverifikasi Ledger Audit.",
     sentAt: "2026-08-01T08:15:05Z",
     status: "sent",
     gatewayResponse: "200 OK (Fonnte API Sent)"
@@ -220,7 +220,7 @@ export const initialWANotifications: WANotification[] = [
     transactionId: "tx-20260730-004",
     recipientPhone: "081345678901",
     recipientName: "H. Agus Setiawan",
-    message: "Jazakallahu Khairan Bpk H. Agus Setiawan! Infaq Renovasi sebesar Rp 15.000.000 telah diverifikasi oleh Bendahara Masjid Agung Al-Ikhlas (No KWT: KWT-202607-088).",
+    message: "Jazakallahu Khairan Bpk H. Agus Setiawan! Infaq Renovasi sebesar Rp 15.000.000 telah diverifikasi oleh Bendahara Masjid SDN 012 Tarakan(No KWT: KWT-202607-088).",
     sentAt: "2026-07-30T10:01:12Z",
     status: "sent",
     gatewayResponse: "200 OK (Wablas API Sent)"

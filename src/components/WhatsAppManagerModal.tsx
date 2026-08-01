@@ -16,7 +16,7 @@ export const WhatsAppManagerModal: React.FC<WhatsAppManagerModalProps> = ({
   const [notifications, setNotifications] = useState<WANotification[]>([]);
   const [testPhone, setTestPhone] = useState('08123456789');
   const [testName, setTestName] = useState('Bpk. Jamaah');
-  const [testMsg, setTestMsg] = useState('Tes Notifikasi Otomatis Keuangan Masjid Agung Al-Ikhlas.');
+  const [testMsg, setTestMsg] = useState('Tes Notifikasi Otomatis Keuangan Masjid SDN 012 Tarakan.');
   const [sending, setSending] = useState(false);
 
   // Fetch WA Notifications log
@@ -68,7 +68,7 @@ export const WhatsAppManagerModal: React.FC<WhatsAppManagerModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        
+
         {/* Header */}
         <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
           <div>

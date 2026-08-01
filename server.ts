@@ -58,7 +58,7 @@ async function startServer() {
       if (!newTx.id) {
         newTx.id = 'tx-' + Date.now();
       }
-      
+
       transactionsStore.unshift(newTx);
 
       // Create Audit Log
@@ -172,7 +172,7 @@ async function startServer() {
         `- [${t.date}] ${t.type.toUpperCase()}: Rp ${t.amount.toLocaleString('id-ID')} (${t.category} - ${t.description}) [${t.fundAccount}]`
       ).join('\n');
 
-      let systemPrompt = `Anda adalah Asisten Keuangan & Audit AI Senior untuk Masjid Agung Al-Ikhlas.
+      let systemPrompt = `Anda adalah Asisten Keuangan & Audit AI Senior untuk Masjid SDN 012 Tarakan.
       Data Keuangan Saat Ini:
       - Total Pemasukan: Rp ${totalIncome.toLocaleString('id-ID')}
       - Total Pengeluaran: Rp ${totalExpense.toLocaleString('id-ID')}

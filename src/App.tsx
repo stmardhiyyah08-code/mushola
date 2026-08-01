@@ -16,7 +16,13 @@ import { LoginPage } from './components/LoginPage';
 import { Transaction, MosqueProfile, UserSession, FinancialStats } from './types';
 import { initialMosqueProfile, initialTransactions } from './data/mockData';
 import { Building2, HeartHandshake, ShieldCheck, Heart, Sparkles, MessageSquare, Cloud, QrCode } from 'lucide-react';
-import { saveTransactionToSupabase, saveMosqueProfileToSupabase } from './lib/supabase';
+import { 
+  saveTransactionToSupabase, 
+  saveMosqueProfileToSupabase,
+  fetchTransactionsFromSupabase,
+  fetchMosqueProfileFromSupabase,
+  deleteTransactionFromSupabase
+} from './lib/supabase';
 
 export default function App() {
   const [mosque, setMosque] = useState<MosqueProfile>(initialMosqueProfile);
@@ -42,23 +48,37 @@ export default function App() {
   const [isCloudflareModalOpen, setIsCloudflareModalOpen] = useState(false);
   const [isQRISModalOpen, setIsQRISModalOpen] = useState(false);
 
-  // Fetch initial data from backend API
-  useEffect(() => {
-    fetch('/api/transactions')
-      .then(res => res.json())
-      .then(data => {
-        if (data.transactions && data.transactions.length > 0) {
-          setTransactions(data.transactions);
-        }
-      })
-      .catch(err => console.log('Using local client state initial data', err));
+  // Load initial data automatically from Supabase PostgreSQL database
+  const refreshData = async () => {
+    const supabaseTxs = await fetchTransactionsFromSupabase();
+    if (supabaseTxs && supabaseTxs.length > 0) {
+      setTransactions(supabaseTxs);
+    } else {
+      fetch('/api/transactions')
+        .then(res => res.json())
+        .then(data => {
+          if (data.transactions && data.transactions.length > 0) {
+            setTransactions(data.transactions);
+          }
+        })
+        .catch(err => console.log('Using local client state initial data', err));
+    }
 
-    fetch('/api/mosque-profile')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.name) setMosque(data);
-      })
-      .catch(console.error);
+    const supabaseProfile = await fetchMosqueProfileFromSupabase();
+    if (supabaseProfile && supabaseProfile.name) {
+      setMosque(supabaseProfile);
+    } else {
+      fetch('/api/mosque-profile')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.name) setMosque(data);
+        })
+        .catch(console.error);
+    }
+  };
+
+  useEffect(() => {
+    refreshData();
   }, []);
 
   // Compute live financial statistics
@@ -100,15 +120,16 @@ export default function App() {
     };
   }, [transactions]);
 
-  // Handle Adding New Transaction
+  // Handle Adding New Transaction (Auto-Saves to Supabase)
   const handleAddTransaction = async (newTx: Transaction) => {
     setTransactions(prev => [newTx, ...prev]);
     await saveTransactionToSupabase(newTx);
   };
 
-  // Handle Deleting Transaction
+  // Handle Deleting Transaction (Auto-Deletes from Supabase)
   const handleDeleteTransaction = async (id: string) => {
     setTransactions(prev => prev.filter(t => t.id !== id));
+    await deleteTransactionFromSupabase(id);
 
     try {
       await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
@@ -117,9 +138,10 @@ export default function App() {
     }
   };
 
-  // Handle Editing Transaction
+  // Handle Editing Transaction (Auto-Updates in Supabase)
   const handleEditTransaction = async (updatedTx: Transaction) => {
     setTransactions(prev => prev.map(t => t.id === updatedTx.id ? updatedTx : t));
+    await saveTransactionToSupabase(updatedTx);
 
     try {
       await fetch(`/api/transactions/${updatedTx.id}`, {
@@ -317,6 +339,7 @@ export default function App() {
       <CloudflareSupabaseModal
         isOpen={isCloudflareModalOpen}
         onClose={() => setIsCloudflareModalOpen(false)}
+        onRefreshData={refreshData}
       />
 
     </div>
