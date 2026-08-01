@@ -1,0 +1,6 @@
+{
+  "name": "SiMasjid Keuangan",
+  "description": "Sistem Keuangan & Donasi Masjid Real-time dengan Admin Dashboard, Export PDF/Excel, Notifikasi WhatsApp, dan Laporan Transparan",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
