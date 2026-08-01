@@ -182,12 +182,12 @@ export default function App() {
     await refreshData();
   };
 
-  // Display Login Page if explicitly requested
-  if (currentView === 'login') {
+  // Display Login Page if user is NOT logged in or explicitly requested
+  if (!session.isLogged || currentView === 'login') {
     return (
       <LoginPage
         mosque={mosque}
-        canGoBack={true}
+        canGoBack={session.isLogged}
         onLoginSuccess={handleLoginSuccess}
         onBackToApp={() => setCurrentView('dashboard')}
       />
