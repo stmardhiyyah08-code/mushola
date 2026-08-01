@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Building2, KeyRound, ShieldCheck, UserCheck, Lock, ArrowLeft, CheckCircle2, User, Eye, EyeOff, Sparkles, ChevronRight, Mail, UserPlus, LogIn, ShieldAlert, CheckSquare } from 'lucide-react';
+import { Building2, KeyRound, ShieldCheck, UserCheck, Lock, ArrowLeft, CheckCircle2, User, Eye, EyeOff, Sparkles, Mail, UserPlus, LogIn, ShieldAlert, CheckSquare } from 'lucide-react';
 import { UserSession, MosqueProfile } from '../types';
 import { isSupabaseConfigured, registerUserToSupabase, verifyAndLoginUserInSupabase, verifyUserCodeInSupabase } from '../lib/supabase';
+import { BiometricFaceIDScanner } from './BiometricFaceIDScanner';
 
 interface LoginPageProps {
   mosque: MosqueProfile;
@@ -27,6 +28,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingSession, setPendingSession] = useState<UserSession | null>(null);
+  const [showFaceIDScanner, setShowFaceIDScanner] = useState(false);
 
   const roles = [
     {
@@ -127,7 +130,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           authMethod: 'password',
           lastActive: new Date().toISOString()
         };
-        onLoginSuccess(newSession);
+        // Trigger mandatory Biometric Face ID scan before granting session
+        setPendingSession(newSession);
+        setShowFaceIDScanner(true);
       } else if (res.isUnverified) {
         setErrorMsg(res.error || 'Akun Anda belum diverifikasi.');
         setMode('verify');
@@ -456,6 +461,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       <div className="max-w-6xl w-full mx-auto text-center text-slate-500 text-xs py-2">
         <p>{mosque.name} • System Platform Keuangan Digital Mandiri</p>
       </div>
+
+      {/* Biometric Face ID Scanner Step */}
+      {showFaceIDScanner && pendingSession && (
+        <BiometricFaceIDScanner
+          userName={pendingSession.userName}
+          userRole={pendingSession.userRole}
+          onSuccess={() => {
+            setShowFaceIDScanner(false);
+            onLoginSuccess(pendingSession);
+          }}
+          onCancel={() => {
+            setShowFaceIDScanner(false);
+            setPendingSession(null);
+            setErrorMsg('Verifikasi Biometrik Face ID Dibatalkan.');
+          }}
+        />
+      )}
 
     </div>
   );

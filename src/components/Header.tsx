@@ -1,15 +1,7 @@
 import React from 'react';
 import { 
   Building2, 
-  ShieldCheck, 
-  Bot, 
-  HeartHandshake, 
-  Lock, 
   LogOut, 
-  FileText, 
-  MessageSquare, 
-  Cloud,
-  CheckCircle2,
   KeyRound,
   UserCheck,
   QrCode,
@@ -22,11 +14,6 @@ interface HeaderProps {
   session: UserSession;
   onOpenAuth: () => void;
   onLogout: () => void;
-  onOpenDonation: () => void;
-  onOpenAI: () => void;
-  onOpenWA: () => void;
-  onOpenAudit: () => void;
-  onOpenCloudflare: () => void;
   onOpenQRISManager: () => void;
   onOpenUserManager?: () => void;
 }
@@ -36,11 +23,6 @@ export const Header: React.FC<HeaderProps> = ({
   session,
   onOpenAuth,
   onLogout,
-  onOpenDonation,
-  onOpenAI,
-  onOpenWA,
-  onOpenAudit,
-  onOpenCloudflare,
   onOpenQRISManager,
   onOpenUserManager
 }) => {
@@ -68,55 +50,6 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Quick Action Navigation Bar */}
           <div className="flex flex-wrap items-center gap-2">
-            
-            {/* Donation Quick Trigger */}
-            <button
-              onClick={onOpenDonation}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-all shadow-md shadow-emerald-100 active:scale-95"
-            >
-              <HeartHandshake className="w-4 h-4" />
-              <span>Infaq / Donasi QRIS</span>
-            </button>
-
-            {/* AI Financial Assistant */}
-            <button
-              onClick={onOpenAI}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold transition-all"
-              title="Asisten AI Keuangan Masjid"
-            >
-              <Bot className="w-4 h-4 text-indigo-600" />
-              <span className="hidden sm:inline">AI Takmir</span>
-            </button>
-
-            {/* WA Gateway Logs */}
-            <button
-              onClick={onOpenWA}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold transition-all"
-              title="Integrasi WA Gateway & Notifikasi"
-            >
-              <MessageSquare className="w-4 h-4 text-emerald-600" />
-              <span className="hidden sm:inline">WA Notif</span>
-            </button>
-
-            {/* Audit Security Integrity */}
-            <button
-              onClick={onOpenAudit}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-semibold transition-all"
-              title="Audit Keamanan SHA-256 Ledger"
-            >
-              <ShieldCheck className="w-4 h-4 text-amber-600" />
-              <span className="hidden md:inline">Audit SHA-256</span>
-            </button>
-
-            {/* Cloudflare & Supabase Config */}
-            <button
-              onClick={onOpenCloudflare}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-semibold transition-all"
-              title="Cloudflare & Supabase Setup"
-            >
-              <Cloud className="w-4 h-4 text-sky-600" />
-              <span className="hidden md:inline">Cloudflare/Supabase</span>
-            </button>
 
             {/* QRIS & Bank Account Settings Manager */}
             <button

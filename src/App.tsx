@@ -188,11 +188,6 @@ export default function App() {
             lastActive: new Date().toISOString()
           });
         }}
-        onOpenDonation={() => setIsDonationModalOpen(true)}
-        onOpenAI={() => setIsAIModalOpen(true)}
-        onOpenWA={() => setIsWAModalOpen(true)}
-        onOpenAudit={() => setIsAuditModalOpen(true)}
-        onOpenCloudflare={() => setIsCloudflareModalOpen(true)}
         onOpenQRISManager={() => setIsQRISModalOpen(true)}
         onOpenUserManager={() => setIsUserManagerModalOpen(true)}
       />
