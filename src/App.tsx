@@ -28,14 +28,37 @@ export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
   const [currentView, setCurrentView] = useState<'dashboard' | 'login'>('dashboard');
   
-  // User Session state
-  const [session, setSession] = useState<UserSession>({
-    isLogged: false,
-    userRole: 'guest',
-    userName: 'Jamaah Donatur',
-    authMethod: 'pin',
-    lastActive: new Date().toISOString()
+  // Initialize User Session state from LocalStorage so refresh preserves session
+  const [session, setSession] = useState<UserSession>(() => {
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('simasjid_session');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.warn('Failed to parse saved session');
+        }
+      }
+    }
+    return {
+      isLogged: false,
+      userRole: 'guest',
+      userName: 'Jamaah Donatur',
+      authMethod: 'pin',
+      lastActive: new Date().toISOString()
+    };
   });
+
+  // Persist session changes to LocalStorage
+  useEffect(() => {
+    if (typeof localStorage !== 'undefined') {
+      if (session.isLogged) {
+        localStorage.setItem('simasjid_session', JSON.stringify(session));
+      } else {
+        localStorage.removeItem('simasjid_session');
+      }
+    }
+  }, [session]);
 
   // Modal Visibility States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -152,16 +175,20 @@ export default function App() {
     }
   };
 
-  // Force display Login Page if user is not logged in or requested login view
-  if (!session.isLogged || currentView === 'login') {
+  // Handle Successful Login: Auto-Sync Data & Return to Main Dashboard
+  const handleLoginSuccess = async (newSession: UserSession) => {
+    setSession(newSession);
+    setCurrentView('dashboard');
+    await refreshData();
+  };
+
+  // Display Login Page if explicitly requested
+  if (currentView === 'login') {
     return (
       <LoginPage
         mosque={mosque}
-        canGoBack={session.isLogged}
-        onLoginSuccess={(newSession) => {
-          setSession(newSession);
-          setCurrentView('dashboard');
-        }}
+        canGoBack={true}
+        onLoginSuccess={handleLoginSuccess}
         onBackToApp={() => setCurrentView('dashboard')}
       />
     );
@@ -176,13 +203,17 @@ export default function App() {
         session={session}
         onOpenAuth={() => setCurrentView('login')}
         onLogout={() => {
-          setSession({
+          const guestSession: UserSession = {
             isLogged: false,
             userRole: 'guest',
             userName: 'Jamaah Donatur',
             authMethod: 'pin',
             lastActive: new Date().toISOString()
-          });
+          };
+          setSession(guestSession);
+          if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem('simasjid_session');
+          }
         }}
         onOpenUserManager={() => setIsUserManagerModalOpen(true)}
       />
