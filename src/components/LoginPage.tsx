@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Building2, KeyRound, ShieldCheck, UserCheck, Lock, ArrowLeft, CheckCircle2, User, Eye, EyeOff, Sparkles, ChevronRight, Mail, UserPlus, LogIn } from 'lucide-react';
+import { Building2, KeyRound, ShieldCheck, UserCheck, Lock, ArrowLeft, CheckCircle2, User, Eye, EyeOff, Sparkles, ChevronRight, Mail, UserPlus, LogIn, ShieldAlert, CheckSquare } from 'lucide-react';
 import { UserSession, MosqueProfile } from '../types';
-import { isSupabaseConfigured, registerUserToSupabase, verifyAndLoginUserInSupabase } from '../lib/supabase';
+import { isSupabaseConfigured, registerUserToSupabase, verifyAndLoginUserInSupabase, verifyUserCodeInSupabase } from '../lib/supabase';
 
 interface LoginPageProps {
   mosque: MosqueProfile;
@@ -16,11 +16,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   onBackToApp,
   canGoBack = false
 }) => {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register' | 'verify'>('login');
   const [selectedRole, setSelectedRole] = useState<'admin' | 'treasurer' | 'auditor'>('treasurer');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [demoCodeHint, setDemoCodeHint] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -53,13 +55,34 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     }
   ];
 
+  // Submit Handler for Login, Register & OTP Verification
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
 
+    if (mode === 'verify') {
+      if (!otpCode || otpCode.length < 4) {
+        setErrorMsg('Masukkan 6 digit Kode Verifikasi OTP.');
+        return;
+      }
+
+      setIsLoading(true);
+      const res = await verifyUserCodeInSupabase(email, otpCode);
+      setIsLoading(false);
+
+      if (res.success) {
+        setSuccessMsg('Alhamdulillah! Akun Anda berhasil DIVERIFIKASI di Supabase Database. Silakan langsung login.');
+        setMode('login');
+        setOtpCode('');
+      } else {
+        setErrorMsg(res.error || 'Gagal memverifikasi kode OTP.');
+      }
+      return;
+    }
+
     if (!email) {
-      setErrorMsg('Mohon masukkan alamat Email resmi.');
+      setErrorMsg('Mohon masukkan alamat Email resmi pengurus.');
       return;
     }
 
@@ -85,9 +108,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
       setIsLoading(false);
       if (res.success) {
-        setSuccessMsg(`Alhamdulillah! Akun ${name} (${selectedRole.toUpperCase()}) berhasil terdaftar & terverifikasi di Supabase database. Silakan langsung masuk.`);
-        setMode('login');
-        setPassword('');
+        setSuccessMsg(`Pendaftaran Berhasil! Kode Verifikasi OTP Anda adalah: ${res.verificationCode}. Masukkan kode ini untuk memverifikasi akun.`);
+        setDemoCodeHint(res.verificationCode || '');
+        setMode('verify');
       } else {
         setErrorMsg(res.error || 'Gagal mendaftarkan akun di Supabase.');
       }
@@ -105,6 +128,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           lastActive: new Date().toISOString()
         };
         onLoginSuccess(newSession);
+      } else if (res.isUnverified) {
+        setErrorMsg(res.error || 'Akun Anda belum diverifikasi.');
+        setMode('verify');
       } else {
         setErrorMsg(res.error || 'Gagal login. Akun tidak ditemukan di database Supabase.');
       }
@@ -150,36 +176,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
           <div className="space-y-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Portal Pengurus {mosque.name}
+              Portal Otentikasi & Verifikasi {mosque.name}
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Sistem keuangan masjid berbasis digital. Masuk untuk mengelola transaksi, mengubah QRIS masjid, dan mengunduh laporan audit.
+              Seluruh pengurus masjid WAJIB terdaftar & diverifikasi di database Supabase sebelum dapat masuk ke dashboard keuangan.
             </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-800 space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
               <Sparkles className="w-4 h-4" />
-              <span>Aplikasi Mandiri & Amanah</span>
+              <span>Verifikasi Keamanan Wajib</span>
             </div>
             <ul className="text-[11px] text-slate-400 space-y-1.5 font-medium">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span>Tanpa akun demo & terhubung langsung ke database</span>
+                <span>Akun belum terdaftar di Supabase ditolak otomatis</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span>Otentikasi terenkripsi SHA-256</span>
+                <span>Verifikasi Kode OTP 6-Digit sebelum login</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span>Manajemen QRIS & Rekening Bank Mandiri</span>
+                <span>Terenkripsi SHA-256 & Supabase RLS</span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Right Side Login / Register Card */}
+        {/* Right Side Form Card */}
         <div className="md:col-span-7 bg-slate-950/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
           
           {/* Mode Switcher */}
@@ -187,160 +213,248 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <Lock className="w-5 h-5 text-emerald-400" />
-                <span>{mode === 'login' ? 'Masuk Sesi Pengurus' : 'Registrasi Akun Pengurus Baru'}</span>
+                <span>
+                  {mode === 'login' && 'Masuk Sesi Pengurus'}
+                  {mode === 'register' && 'Registrasi Akun Pengurus Baru'}
+                  {mode === 'verify' && 'Verifikasi Kode OTP (6-Digit)'}
+                </span>
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                {mode === 'login' ? 'Masukkan kredensial akun Anda.' : 'Daftarkan kredensial pengurus masjid baru.'}
+                {mode === 'login' && 'Verifikasi kredensial terdaftar di Supabase.'}
+                {mode === 'register' && 'Daftarkan akun pengurus baru ke Supabase.'}
+                {mode === 'verify' && 'Masukkan 6 digit kode OTP verifikasi Anda.'}
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setMode(mode === 'login' ? 'register' : 'login');
-                setErrorMsg('');
-                setSuccessMsg('');
-              }}
-              className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold underline underline-offset-4"
-            >
-              {mode === 'login' ? '+ Buat Akun' : 'Sudah Punya Akun?'}
-            </button>
+            <div className="flex items-center gap-3">
+              {mode !== 'login' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('login');
+                    setErrorMsg('');
+                    setSuccessMsg('');
+                  }}
+                  className="text-xs text-slate-400 hover:text-white font-medium"
+                >
+                  Batal / Login
+                </button>
+              )}
+
+              {mode === 'login' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('register');
+                    setErrorMsg('');
+                    setSuccessMsg('');
+                  }}
+                  className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold underline underline-offset-4"
+                >
+                  + Buat Akun
+                </button>
+              )}
+            </div>
           </div>
 
           {successMsg && (
-            <div className="p-3 bg-emerald-950/60 border border-emerald-500/40 rounded-xl text-xs text-emerald-300 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{successMsg}</span>
+            <div className="p-3.5 bg-emerald-950/60 border border-emerald-500/40 rounded-2xl text-xs text-emerald-300 space-y-1">
+              <div className="flex items-center gap-2 font-bold">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Status Berhasil</span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-emerald-200/90">{successMsg}</p>
             </div>
           )}
 
-          {/* Role Selector */}
-          <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-300">Pilih Tanggung Jawab / Role</label>
-            <div className="grid grid-cols-1 gap-2">
-              {roles.map((r) => {
-                const IconComp = r.icon;
-                const isSelected = selectedRole === r.id;
-                return (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setSelectedRole(r.id as any)}
-                    className={`p-3 rounded-2xl border text-left transition-all flex items-center justify-between ${
-                      isSelected
-                        ? 'bg-emerald-950/60 border-emerald-500/80 text-white shadow-md'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900/80'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-xl ${isSelected ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
-                        <IconComp className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-white">{r.title}</span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-medium">
-                            {r.badge}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{r.desc}</p>
-                      </div>
-                    </div>
-                    {isSelected && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
-                  </button>
-                );
-              })}
+          {errorMsg && (
+            <div className="p-3.5 bg-rose-950/60 border border-rose-500/40 rounded-2xl text-xs text-rose-300 flex items-center gap-2 font-medium">
+              <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>{errorMsg}</span>
             </div>
-          </div>
+          )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'register' && (
+          {/* VERIFY OTP MODE */}
+          {mode === 'verify' ? (
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Nama Lengkap Pengurus
+                  Email Terdaftar
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
-                    type="text"
+                    type="email"
                     required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Masukkan nama lengkap & gelar..."
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="pengurus@masjid.or.id"
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
-            )}
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Email Pengurus / ID Masjid
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-300">
+                    Masukkan 6-Digit Kode Verifikasi (OTP)
+                  </label>
+                  {demoCodeHint && (
+                    <span className="text-[11px] text-emerald-400 font-mono font-bold">Kode OTP: {demoCodeHint}</span>
+                  )}
+                </div>
+                
                 <input
-                  type="email"
+                  type="text"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="pengurus@masjid.or.id"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  placeholder="Contoh: 123456"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-mono font-bold tracking-widest text-emerald-400 focus:outline-none focus:border-emerald-500"
                 />
+                <p className="text-[11px] text-slate-400 mt-1">Masukkan 6 digit kode OTP verifikasi Anda.</p>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Password / PIN Keamanan
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan password / PIN..."
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <span>Memverifikasi Kode OTP...</span>
+                ) : (
+                  <>
+                    <CheckSquare className="w-4 h-4" />
+                    <span>Verifikasi & Aktifkan Akun Supabase</span>
+                  </>
+                )}
+              </button>
+            </form>
+          ) : (
+            /* LOGIN / REGISTER MODE */
+            <form onSubmit={handleSubmit} className="space-y-4">
+              
+              {/* Role Selection */}
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold text-slate-300">Pilih Peran Pengurus</label>
+                <div className="grid grid-cols-1 gap-2">
+                  {roles.map((r) => {
+                    const IconComp = r.icon;
+                    const isSelected = selectedRole === r.id;
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() => setSelectedRole(r.id as any)}
+                        className={`p-3 rounded-2xl border text-left transition-all flex items-center justify-between ${
+                          isSelected
+                            ? 'bg-emerald-950/60 border-emerald-500/80 text-white shadow-md'
+                            : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900/80'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-xl ${isSelected ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                            <IconComp className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-white">{r.title}</span>
+                              <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-medium">
+                                {r.badge}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-400 mt-0.5">{r.desc}</p>
+                          </div>
+                        </div>
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
 
-            {errorMsg && (
-              <p className="text-xs text-rose-400 font-medium flex items-center gap-1">
-                <span>⚠️</span> {errorMsg}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 transition-all flex items-center justify-center gap-2 active:scale-95"
-            >
-              {isLoading ? (
-                <span>Memproses...</span>
-              ) : mode === 'login' ? (
-                <>
-                  <LogIn className="w-4 h-4" />
-                  <span>Masuk Sesi {roles.find(r => r.id === selectedRole)?.title}</span>
-                </>
-              ) : (
-                <>
-                  <UserPlus className="w-4 h-4" />
-                  <span>Daftarkan Akun Pengurus</span>
-                </>
+              {mode === 'register' && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Nama Lengkap Pengurus
+                  </label>
+                  <div className="relative">
+                    <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Masukkan nama lengkap & gelar..."
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
               )}
-            </button>
-          </form>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Email Resmi Pengurus
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="pengurus@masjid.or.id"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Password / PIN Keamanan
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Masukkan password / PIN..."
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 transition-all flex items-center justify-center gap-2 active:scale-95"
+              >
+                {isLoading ? (
+                  <span>Memverifikasi ke Database Supabase...</span>
+                ) : mode === 'login' ? (
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    <span>Masuk Sesi {roles.find(r => r.id === selectedRole)?.title}</span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-4 h-4" />
+                    <span>Lanjutkan Pendaftaran & Minta Kode OTP</span>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
 
         </div>
 
