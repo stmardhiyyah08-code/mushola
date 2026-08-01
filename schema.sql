@@ -1,10 +1,10 @@
 -- ====================================================================
--- SIMASJID - SKEMA DATABASE SUPABASE POSTGRESQL REALTIME (VERSI TERBARU)
+-- SIMASJID - SKEMA DATABASE SUPABASE POSTGRESQL REALTIME (TERBARU)
 -- Platform Keuangan Digital Mandiri Masjid SDN 012 Tarakan
 -- Terintegrasi Otomatis Untuk Seluruh Tabel & Menu Sistem:
--- 1. Profil Masjid & Rekening Transfer Bank
+-- 1. Profil Masjid & Rekening Transfer Bank Resmi
 -- 2. Buku Kas Transaksi Keuangan & Kuitansi Digital
--- 3. Otentikasi User Pengurus, Verifikasi OTP & WebAuthn Biometrik Android
+-- 3. Otentikasi User Pengurus, Verifikasi OTP & Sidik Jari WebAuthn Hardware
 -- 4. Notifikasi WhatsApp Gateway Log
 -- 5. Audit Integrity Ledger SHA-256 Chain
 -- 6. Konfigurasi Sistem Cloudflare & Supabase
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
 );
 
 -- ====================================================================
--- TABEL 3: MANAJEMEN USER PENGURUS, VERIFIKASI & WEBAUTHN BIOMETRIK
+-- TABEL 3: MANAJEMEN USER PENGURUS & OTENTIKASI SIDIK JARI WEBAUTHN
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     is_verified BOOLEAN DEFAULT TRUE,
     is_active BOOLEAN DEFAULT TRUE,
     verification_code VARCHAR(50) DEFAULT 'VERIFIED_SUPABASE',
-    webauthn_credential_id TEXT DEFAULT '',
+    webauthn_credential_id TEXT DEFAULT '', -- ID Kredensial Sensor Sidik Jari Perangkat
     last_login TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -171,7 +171,7 @@ INSERT INTO public.system_configs (config_key, config_value, description)
 VALUES 
 ('APP_NAME', 'SiMasjid Platform Digital', 'Nama resmi aplikasi'),
 ('LEDGER_ENCRYPTION', 'SHA-256', 'Standar enkripsi ledger anti-tampering'),
-('BIOMETRIC_AUTH', 'WEBAUTHN_ANDROID', 'Dukungan Biometrik Sidik Jari & Wajah Android'),
+('BIOMETRIC_AUTH', 'WEBAUTHN_HARDWARE_FINGERPRINT', 'Dukungan Biometrik Sidik Jari Hardware Perangkat'),
 ('SUPABASE_REALTIME', 'ENABLED', 'Status integrasi realtime')
 ON CONFLICT (config_key) DO NOTHING;
 

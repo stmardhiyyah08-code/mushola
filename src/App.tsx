@@ -6,7 +6,6 @@ import { TransactionTable } from './components/TransactionTable';
 import { AddTransactionModal } from './components/AddTransactionModal';
 import { DonationModal } from './components/DonationModal';
 import { AdminAuthModal } from './components/AdminAuthModal';
-import { AIFinancialAssistantModal } from './components/AIFinancialAssistantModal';
 import { WhatsAppManagerModal } from './components/WhatsAppManagerModal';
 import { AuditIntegrityModal } from './components/AuditIntegrityModal';
 import { CloudflareSupabaseModal } from './components/CloudflareSupabaseModal';
@@ -15,7 +14,7 @@ import { LoginPage } from './components/LoginPage';
 
 import { Transaction, MosqueProfile, UserSession, FinancialStats } from './types';
 import { initialMosqueProfile, initialTransactions } from './data/mockData';
-import { Building2, HeartHandshake, ShieldCheck, Heart, Sparkles, MessageSquare, Cloud } from 'lucide-react';
+import { Building2, HeartHandshake, ShieldCheck, Heart, MessageSquare, Cloud } from 'lucide-react';
 import { 
   saveTransactionToSupabase, 
   saveMosqueProfileToSupabase,
@@ -42,7 +41,6 @@ export default function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [isWAModalOpen, setIsWAModalOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isCloudflareModalOpen, setIsCloudflareModalOpen] = useState(false);
@@ -217,14 +215,6 @@ export default function App() {
               <HeartHandshake className="w-4 h-4" />
               <span>Infaq / Transfer Donasi</span>
             </button>
-
-            <button
-              onClick={() => setIsAIModalOpen(true)}
-              className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-semibold text-xs transition-all flex items-center gap-2 active:scale-95"
-            >
-              <Sparkles className="w-4 h-4 text-indigo-600" />
-              <span>Asisten AI</span>
-            </button>
           </div>
         </div>
 
@@ -297,11 +287,6 @@ export default function App() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={(newSession) => setSession(newSession)}
-      />
-
-      <AIFinancialAssistantModal
-        isOpen={isAIModalOpen}
-        onClose={() => setIsAIModalOpen(false)}
       />
 
       <WhatsAppManagerModal
